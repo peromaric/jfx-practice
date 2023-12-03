@@ -3,6 +3,8 @@ module hr.tvz.jfxpractice {
     requires javafx.fxml;
 
 
-    opens hr.tvz.jfxpractice to javafx.fxml;
-    exports hr.tvz.jfxpractice;
+    opens hr.tvz.dev to javafx.fxml;
+    exports hr.tvz.dev;
+    exports hr.tvz.dev.controllers;
+    opens hr.tvz.dev.controllers to javafx.fxml;
 }
