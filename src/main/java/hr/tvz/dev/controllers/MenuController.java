@@ -11,7 +11,31 @@ public class MenuController {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("item.fxml"));
         try {
             Scene scene = new Scene(fxmlLoader.load(), 600, 400);
-            Main.getMainStage().setTitle("Cars");
+            Main.getMainStage().setTitle("Items");
+            Main.getMainStage().setScene(scene);
+            Main.getMainStage().show();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void showFactorySearchScreen() {
+        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("factory.fxml"));
+        try {
+            Scene scene = new Scene(fxmlLoader.load(), 600, 400);
+            Main.getMainStage().setTitle("Factories");
+            Main.getMainStage().setScene(scene);
+            Main.getMainStage().show();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void showStoreSearchScreen() {
+        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("store.fxml"));
+        try {
+            Scene scene = new Scene(fxmlLoader.load(), 600, 400);
+            Main.getMainStage().setTitle("Stores");
             Main.getMainStage().setScene(scene);
             Main.getMainStage().show();
         } catch (IOException e) {

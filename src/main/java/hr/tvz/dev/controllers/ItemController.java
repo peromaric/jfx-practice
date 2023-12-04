@@ -61,11 +61,7 @@ public class ItemController {
             }
         });
 
-        discountTableColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Item, String>, ObservableValue<String>>() {
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<Item, String> param) {
-                return new ReadOnlyStringWrapper(param.getValue().getDiscount().discountAmount().toString());
-            }
-        });
+        discountTableColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getDiscount().discountAmount().toString()));
 
 
         List<Item> itemList = Item.readItems(Category.readCategories());

@@ -79,6 +79,11 @@ public class Address implements Serializable {
     }
 
     @Override
+    public String toString() {
+        return street + houseNumber + ", " + city;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Address address)) return false;

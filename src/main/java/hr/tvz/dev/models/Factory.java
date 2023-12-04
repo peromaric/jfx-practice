@@ -27,6 +27,10 @@ public class Factory extends NamedEntity implements Serializable {
         return getItems().stream().max(Comparator.comparing(Item::calculateVolume)).get();
     }
 
+    public String getItemsAsString() {
+        return getItems().stream().map(Item::getName).reduce((a, b) -> a + "; " + b).get();
+    }
+
     public static List<Factory> readFactories(List<Item> items, List<Address> addresses) {
         List<Factory> factories = new ArrayList<>();
 

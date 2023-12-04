@@ -45,6 +45,10 @@ public class Store extends NamedEntity implements Serializable {
         return stores;
     }
 
+    public String getItemsAsString() {
+        return getItems().stream().map(Item::getName).reduce((a, b) -> a + "; " + b).get();
+    }
+
     public Item findCheapestItem() {
         return items.stream().min(Comparator.comparing(Item::getSellingPrice)).get();
     }
