@@ -14,26 +14,6 @@ public class Category extends NamedEntity {
         this.description = description;
     }
 
-    public static List<Category> readCategories() {
-        try(Stream<String> stream = Files.lines(new File("dat/categories.txt").toPath())) {
-            List<String> data = stream.toList();
-            int datasetSize = 3;
-            int amountOfObjects = data.size() / datasetSize;
-            List<Category> categories = new ArrayList<>();
-            for(int i = 0; i < data.size(); i+=amountOfObjects) {
-                categories.add(
-                        new Category(
-                                Long.parseLong(data.get(i)),
-                                data.get(i+1),
-                                data.get(i+2)
-                        )
-                );
-            }
-            return categories;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
     public String getDescription() {
         return description;
     }

@@ -1,6 +1,7 @@
 package hr.tvz.dev.controllers;
 
 import hr.tvz.dev.models.*;
+import hr.tvz.dev.utils.Database;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -10,6 +11,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,14 +34,14 @@ public class StoreController {
     private TableColumn<Store, String> itemsTableColumn;
 
     private Optional<List<Store>> stores;
-    public void initialize() {
+    public void initialize() throws SQLException, IOException {
         nameTableColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getName()));
         addressTableColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getWebAddress()));
         itemsTableColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getItemsAsString()));
 
-        List<Category> categories = Category.readCategories();
-        List<Item> items = Item.readItems(categories);
-        setStores(Optional.of(Store.readStores(items)));
+        List<Category> categories = Database.getCategories();
+        List<Item> items = Database.getItems();
+        setStores(Optional.of(Database.getStores()));
         ObservableList<Store> storeObservableList = FXCollections.observableArrayList(getStores().get());
         storeItemComboBox.setItems(FXCollections.observableList(items.stream().map(Item::getName).toList()));
         storeTableView.setItems(storeObservableList);

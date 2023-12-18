@@ -10,6 +10,7 @@ import java.io.IOException;
 public class Main extends Application {
 
     public static Stage mainStage;
+    public static Stage errorStage;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -23,6 +24,7 @@ public class Main extends Application {
     public static Stage getMainStage() {
         return mainStage;
     }
+    public static Stage getErrorStage() { return errorStage; }
 
     public static void main(String[] args) {
         launch();

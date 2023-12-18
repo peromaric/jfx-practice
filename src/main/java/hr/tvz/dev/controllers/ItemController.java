@@ -2,6 +2,7 @@ package hr.tvz.dev.controllers;
 
 import hr.tvz.dev.models.Category;
 import hr.tvz.dev.models.Item;
+import hr.tvz.dev.utils.Database;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -14,6 +15,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.util.Callback;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,7 +39,7 @@ public class ItemController {
     @FXML
     private TableColumn<Item, String> discountTableColumn;
 
-    public void initialize() {
+    public void initialize() throws SQLException, IOException {
         nameTableColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Item, String>, ObservableValue<String>>() {
             public ObservableValue<String> call(TableColumn.CellDataFeatures<Item, String> param) {
                 return new ReadOnlyStringWrapper(param.getValue().getName());
@@ -61,10 +64,8 @@ public class ItemController {
             }
         });
 
-        discountTableColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getDiscount().discountAmount().toString()));
 
-
-        List<Item> itemList = Item.readItems(Category.readCategories());
+        List<Item> itemList = Database.getItems();
         ObservableList<String> itemCategoriesString = FXCollections.observableList(
                 new ArrayList<>(itemList.stream()
                         .map(
@@ -78,8 +79,8 @@ public class ItemController {
         itemTableView.setItems(observableItemList);
     }
 
-    public void itemSearch() {
-        List<Item> carsList = Item.readItems(Category.readCategories());
+    public void itemSearch() throws SQLException, IOException {
+        List<Item> carsList = Database.getItems();
 
         String filterItemName = nameTextField.getText();
         String filterCategory = itemComboBox.getValue();

@@ -2,7 +2,6 @@ package hr.tvz.dev.models;
 
 
 import hr.tvz.dev.enums.City;
-import hr.tvz.dev.models.builders.AddressBuilder;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -17,34 +16,17 @@ public class Address implements Serializable {
     Long id;
     String street;
     String houseNumber;
-    City city;
+    String city;
+    Integer postalCode;
 
-    public Address(Long id, String street, String houseNumber, City city) {
+    public Address(Long id, String street, String houseNumber, String city, Integer postalCode) {
         this.id = id;
         this.street = street;
         this.houseNumber = houseNumber;
         this.city = city;
+        this.postalCode = postalCode;
     }
 
-    public static List<Address> readAddresses() {
-        List<Address> addresses = new ArrayList<>();
-
-        try {
-            List<String> data = Files.readAllLines(Path.of("dat/addresses.txt"));
-            int currentLine = 0;
-            while(currentLine < data.size()) {
-                AddressBuilder addressBuilder = new AddressBuilder();
-                addressBuilder.setId(Long.parseLong(data.get(currentLine++)));
-                addressBuilder.setCity(City.valueOf(data.get(currentLine++)));
-                addressBuilder.setStreet(data.get(currentLine++));
-                addressBuilder.setHouseNumber(data.get(currentLine++));
-                addresses.add(addressBuilder.createAddress());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return addresses;
-    }
 
     public Long getId() {
         return id;
@@ -70,12 +52,20 @@ public class Address implements Serializable {
         this.houseNumber = houseNumber;
     }
 
-    public City getCity() {
+    public String getCity() {
         return city;
     }
 
-    public void setCity(City city) {
+    public void setCity(String city) {
         this.city = city;
+    }
+
+    public Integer getPostalCode() {
+        return postalCode;
+    }
+
+    public void setPostalCode(Integer postalCode) {
+        this.postalCode = postalCode;
     }
 
     @Override

@@ -1,6 +1,6 @@
 package hr.tvz.dev.models;
 
-public sealed interface Technical permits Laptop {
+public interface Technical {
     Integer getGuaranteeExpiration();
     void setGuaranteeExpirationDate(Integer expirationDate);
 }

@@ -7,8 +7,13 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hr.tvz.dev.controllers.MenuController">
     <MenuBar AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <Menu mnemonicParsing="false" text="Categories">
+            <MenuItem mnemonicParsing="false" onAction="#showCategorySearchScreen" text="Search" />
+            <MenuItem mnemonicParsing="false" onAction="#showAddNewItemScreen" text="New" />
+        </Menu>
         <Menu mnemonicParsing="false" text="Items">
             <MenuItem mnemonicParsing="false" onAction="#showItemSearchScreen" text="Search" />
+            <MenuItem mnemonicParsing="false" onAction="#showAddNewItemScreen" text="New" />
         </Menu>
         <Menu mnemonicParsing="false" text="Factories">
             <MenuItem mnemonicParsing="false" onAction="#showFactorySearchScreen" text="Search" />

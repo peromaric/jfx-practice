@@ -1,6 +1,7 @@
 module hr.tvz.jfxpractice {
     requires javafx.controls;
     requires javafx.fxml;
+    requires java.sql;
 
 
     opens hr.tvz.dev to javafx.fxml;
