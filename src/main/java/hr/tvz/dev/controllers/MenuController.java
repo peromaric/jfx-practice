@@ -55,6 +55,18 @@ public class MenuController {
         }
     }
 
+    public void showAddNewCategoryScreen() {
+        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("addNewCategory.fxml"));
+        try {
+            Scene scene = new Scene(fxmlLoader.load(), 600, 400);
+            Main.getMainStage().setTitle("Add new category");
+            Main.getMainStage().setScene(scene);
+            Main.getMainStage().show();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void showCategorySearchScreen() {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("category.fxml"));
         try {
