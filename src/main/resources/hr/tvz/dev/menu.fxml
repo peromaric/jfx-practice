@@ -20,6 +20,7 @@
         </Menu>
         <Menu mnemonicParsing="false" text="Stores">
             <MenuItem mnemonicParsing="false" onAction="#showStoreSearchScreen" text="Search" />
+            <MenuItem mnemonicParsing="false" onAction="#showAddNewStoreScreen" text="New" />
         </Menu>
         <Menu mnemonicParsing="false" text="Help">
             <MenuItem mnemonicParsing="false" text="About" />

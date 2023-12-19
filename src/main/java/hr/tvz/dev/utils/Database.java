@@ -102,12 +102,12 @@ public class Database {
         return items;
     }
 
-    public static List<Item> getStoreItems(Connection connection) throws SQLException {
+    public static List<Item> getStoreItems(Connection connection, Long storeId) throws SQLException {
         List<Item> items = new ArrayList<>();
-        Statement sqlStatement = connection.createStatement();
-        ResultSet itemsResultSet = sqlStatement.executeQuery(
-                "SELECT * FROM STORE_ITEM SI, ITEM I WHERE SI.STORE_ID = 1 AND SI.ITEM_ID = I.ID;"
-        );
+        PreparedStatement sqlStatement = connection.prepareStatement("SELECT * FROM STORE_ITEM SI, ITEM I WHERE SI.STORE_ID = ? " +
+                "AND SI.ITEM_ID = I.ID;");
+        sqlStatement.setLong(1, storeId);
+        ResultSet itemsResultSet = sqlStatement.executeQuery();
         while(itemsResultSet.next()) {
             Item item = getItemFromResultSet(itemsResultSet, connection);
             items.add(item);
@@ -133,6 +133,16 @@ public class Database {
         ResultSet addressResultSet = preparedStatement.executeQuery();
         addressResultSet.first();
         return getAddressFromResultSet(addressResultSet);
+    }
+
+    public static Store getStoreByName(Connection connection, String name) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT * FROM STORE WHERE NAME = ?;"
+        );
+        preparedStatement.setString(1, name);
+        ResultSet storeResultSet = preparedStatement.executeQuery();
+        storeResultSet.first();
+        return getStoreFromResultSet(storeResultSet, connection);
     }
 
     public static Category getCategoryById(Connection connection, String id) throws SQLException {
@@ -169,6 +179,25 @@ public class Database {
         preparedStatement.setBigDecimal(6, item.getProductionCost());
         preparedStatement.setBigDecimal(7, item.getSellingPrice());
         preparedStatement.executeUpdate();
+        connection.close();
+    }
+
+    public static void insertStore(Store store) throws SQLException, IOException {
+        Connection connection = connectToDatabase();
+        PreparedStatement preparedStatement = connection.prepareStatement(
+                "INSERT INTO STORE(NAME, WEB_ADDRESS) VALUES (?,?)");
+        preparedStatement.setString(1, store.getName());
+        preparedStatement.setString(2, store.getWebAddress());
+        preparedStatement.execute();
+        Store newStore = getStoreByName(connection, store.getName());
+        for(Item item : store.getItems()) {
+            PreparedStatement preparedStatementItem = connection.prepareStatement(
+                    "INSERT INTO STORE_ITEM(STORE_ID, ITEM_ID) VALUES (?,?)"
+            );
+            preparedStatementItem.setLong(1, newStore.getId());
+            preparedStatementItem.setLong(2, item.getId());
+            preparedStatementItem.execute();
+        }
         connection.close();
     }
 
@@ -211,7 +240,7 @@ public class Database {
         Long id = storeResultSet.getLong("ID");
         String name = storeResultSet.getString("NAME");
         String webAddresss = storeResultSet.getString("WEB_ADDRESS");
-        List<Item> storeItems = getStoreItems(connection);
+        List<Item> storeItems = getStoreItems(connection, id);
 
         return new Store(id, name, webAddresss, new HashSet<>(storeItems));
     }

@@ -27,7 +27,6 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
         <Label text="Search Items" GridPane.columnSpan="2" GridPane.halignment="CENTER">
             <font>
@@ -54,7 +53,7 @@
                 <Insets left="5.0" right="5.0" />
             </GridPane.margin>
         </ComboBox>
-        <TableView fx:id="itemTableView" GridPane.columnSpan="2" GridPane.rowIndex="5" GridPane.rowSpan="2">
+        <TableView fx:id="itemTableView" GridPane.columnSpan="2" GridPane.rowIndex="4" GridPane.rowSpan="2">
             <columns>
                 <TableColumn fx:id="nameTableColumn" prefWidth="75.0" text="Name" />
                 <TableColumn fx:id="categoryTableColumn" prefWidth="183.0" text="Category" />
@@ -62,6 +61,6 @@
                 <TableColumn fx:id="sellingPriceTableColumn" prefWidth="255.0" text="Selling price (EUR)" />
             </columns>
         </TableView>
-        <Button mnemonicParsing="false" onAction="#itemSearch" text="Search" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
+        <Button mnemonicParsing="false" onAction="#itemSearch" text="Search" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
     </GridPane>
 </VBox>
