@@ -1,13 +1,11 @@
 package hr.tvz.dev.controllers;
 
-import hr.tvz.dev.models.Category;
 import hr.tvz.dev.models.Item;
 import hr.tvz.dev.utils.Database;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
@@ -50,7 +48,6 @@ public class ItemController {
                 return new ReadOnlyStringWrapper(param.getValue().getCategory().getName());
             }
         });
-
         volumeTableColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Item, String>, ObservableValue<String>>() {
             public ObservableValue<String> call(TableColumn.CellDataFeatures<Item, String> param) {
                 return new ReadOnlyStringWrapper(param.getValue().calculateVolume().toString());

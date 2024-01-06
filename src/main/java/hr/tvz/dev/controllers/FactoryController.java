@@ -39,8 +39,6 @@ public class FactoryController {
         addressTableColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getAddress().toString()));
         itemsTableColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getItemsAsString()));
 
-        List<Category> categories = Database.getCategories();
-        List<Address> addresses = Database.getAddresses();
         List<Item> items = Database.getItems();
         setFactories(Optional.of(Database.getFactories()));
         ObservableList<Factory> factoryObservableList = FXCollections.observableArrayList(getFactories().get());

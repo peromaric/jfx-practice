@@ -17,6 +17,7 @@
         </Menu>
         <Menu mnemonicParsing="false" text="Factories">
             <MenuItem mnemonicParsing="false" onAction="#showFactorySearchScreen" text="Search" />
+            <MenuItem mnemonicParsing="false" onAction="#showAddNewFactoryScreen" text="New" />
         </Menu>
         <Menu mnemonicParsing="false" text="Stores">
             <MenuItem mnemonicParsing="false" onAction="#showStoreSearchScreen" text="Search" />

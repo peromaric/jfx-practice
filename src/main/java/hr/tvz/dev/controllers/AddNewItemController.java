@@ -31,8 +31,6 @@ public class AddNewItemController {
     private TextField itemProductionCostTextField;
     @FXML
     private TextField itemSellingPriceTextField;
-    @FXML
-    private TextField itemDiscountTextField;
     private List<Category> categoryList;
 
     public void initialize() throws SQLException, IOException {

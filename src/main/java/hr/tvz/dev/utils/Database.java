@@ -89,12 +89,13 @@ public class Database {
         return stores;
     }
 
-    public static List<Item> getFactoryItems(Connection connection) throws SQLException {
+    public static List<Item> getFactoryItems(Connection connection, Long factoryId) throws SQLException {
         List<Item> items = new ArrayList<>();
-        Statement sqlStatement = connection.createStatement();
-        ResultSet itemsResultSet = sqlStatement.executeQuery(
-                "SELECT * FROM FACTORY_ITEM FI, ITEM I WHERE FI.FACTORY_ID = 1 AND FI.ITEM_ID = I.ID;"
+        PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT * FROM FACTORY_ITEM FI, ITEM I WHERE FI.FACTORY_ID = (?) AND FI.ITEM_ID = I.ID;"
         );
+        preparedStatement.setLong(1, factoryId);
+        ResultSet itemsResultSet = preparedStatement.executeQuery();
         while(itemsResultSet.next()) {
             Item item = getItemFromResultSet(itemsResultSet, connection);
             items.add(item);
@@ -201,6 +202,55 @@ public class Database {
         connection.close();
     }
 
+    public static Long insertAddress(Connection connection, Address address) throws SQLException, IOException {
+        PreparedStatement preparedStatement = connection.prepareStatement(
+                "INSERT INTO  ADDRESS(STREET, HOUSE_NUMBER, CITY, POSTAL_CODE) " +
+                        "VALUES ( ?, ?, ?, ? )",
+                Statement.RETURN_GENERATED_KEYS
+        );
+        preparedStatement.setString(1, address.getStreet());
+        preparedStatement.setString(2, address.getHouseNumber());
+        preparedStatement.setString(3, address.getCity());
+        preparedStatement.setInt(4, address.getPostalCode());
+        preparedStatement.executeUpdate();
+
+        ResultSet rs = preparedStatement.getGeneratedKeys();
+
+        if (rs.next()) {
+            return rs.getLong(1);
+        } else return 0L;
+    }
+
+    public static void insertFactory(Factory factory) throws SQLException, IOException {
+        Connection connection = connectToDatabase();
+
+        Long addressId = insertAddress(connection, factory.getAddress());
+        PreparedStatement preparedStatement = connection.prepareStatement(
+                "INSERT INTO FACTORY(NAME, ADDRESS_ID) VALUES ( ?, ? )",
+                Statement.RETURN_GENERATED_KEYS
+        );
+        preparedStatement.setString(1, factory.getName());
+        preparedStatement.setLong(2, addressId);
+        preparedStatement.executeUpdate();
+
+        ResultSet rs = preparedStatement.getGeneratedKeys();
+        Long factoryId = 0L;
+        if (rs.next()) {
+            factoryId = rs.getLong(1);
+        }
+
+        for(Item item : factory.getItems()) {
+            preparedStatement = connection.prepareStatement(
+                    "INSERT INTO FACTORY_ITEM VALUES ( ?, ? )",
+                    Statement.RETURN_GENERATED_KEYS
+            );
+            preparedStatement.setLong(1, factoryId);
+            preparedStatement.setLong(2, item.getId());
+            preparedStatement.executeUpdate();
+        }
+
+        connection.close();
+    }
     private static Category getCategoryFromResultSet(ResultSet categoryResultSet) throws SQLException {
         Long id = categoryResultSet.getLong("ID");
         String name = categoryResultSet.getString("NAME");
@@ -227,7 +277,7 @@ public class Database {
         String name = factoryResultSet.getString("NAME");
         String addressId = factoryResultSet.getString("ADDRESS_ID");
         Address factoryAddress = getAddressById(connection, addressId);
-        List<Item> factoryItems = getFactoryItems(connection);
+        List<Item> factoryItems = getFactoryItems(connection, id);
 
         return new Factory(id, name, factoryAddress, new HashSet<>(factoryItems));
     }
