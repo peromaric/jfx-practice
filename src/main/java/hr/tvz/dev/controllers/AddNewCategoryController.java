@@ -21,6 +21,8 @@ public class AddNewCategoryController {
     @FXML
     private TextField categoryDescriptionTextField;
 
+    private final Database database = Database.getInstance();
+
     public void addNewCategory() {
         try {
             Category Category = new Category(
@@ -28,7 +30,7 @@ public class AddNewCategoryController {
                     categoryNameTextField.getText(),
                     categoryDescriptionTextField.getText()
             );
-            Database.insertCategory(Category);
+            database.insertCategory(Category);
             HelperFunctions.showOkAlert();
         } catch (RuntimeException | SQLException | IOException ex) {
             HelperFunctions.showErrorAlert(ex);

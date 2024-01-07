@@ -36,6 +36,7 @@ public class ItemController {
     private TableColumn<Item, String> sellingPriceTableColumn;
     @FXML
     private TableColumn<Item, String> discountTableColumn;
+    private final Database database = Database.getInstance();
 
     public void initialize() throws SQLException, IOException {
         nameTableColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Item, String>, ObservableValue<String>>() {
@@ -62,7 +63,7 @@ public class ItemController {
         });
 
 
-        List<Item> itemList = Database.getItems();
+        List<Item> itemList = database.getItems();
         ObservableList<String> itemCategoriesString = FXCollections.observableList(
                 new ArrayList<>(itemList.stream()
                         .map(
@@ -77,7 +78,7 @@ public class ItemController {
     }
 
     public void itemSearch() throws SQLException, IOException {
-        List<Item> carsList = Database.getItems();
+        List<Item> carsList = database.getItems();
 
         String filterItemName = nameTextField.getText();
         String filterCategory = itemComboBox.getValue();

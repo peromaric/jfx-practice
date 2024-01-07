@@ -8,6 +8,7 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -32,13 +33,14 @@ public class CategoryController {
     @FXML
     private TableColumn<Category, String> categoryDescriptionTableColumn;
     Optional<ObservableList<Category>> categories;
+    private final Database database = Database.getInstance();
 
     public void initialize() throws SQLException, IOException {
         categoryIdTableColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getId().toString()));
         categoryNameTableColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getName()));
         categoryDescriptionTableColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getDescription()));
         this.categories = Optional.of(FXCollections.observableList(
-                Database.getCategories()
+                database.getCategories()
         ));
         categoryTableView.setItems(this.categories.get());
     }

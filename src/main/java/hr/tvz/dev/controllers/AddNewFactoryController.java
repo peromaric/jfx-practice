@@ -40,6 +40,7 @@ public class AddNewFactoryController {
     public TextField factoryCityTextField;
     @FXML
     public TextField factoryPostalCodeTextField;
+    private final Database database = Database.getInstance();
 
     public void initialize() throws SQLException, IOException {
         itemNameTableColumn.setCellValueFactory(
@@ -60,7 +61,7 @@ public class AddNewFactoryController {
         );
         itemTableView.setItems(
                 FXCollections.observableList(
-                        Database.getItems()
+                        database.getItems()
                 )
         );
     }
@@ -76,7 +77,7 @@ public class AddNewFactoryController {
                 Integer.parseInt(factoryPostalCodeTextField.getText())
                 );
 
-        Database.insertFactory(new Factory(
+        database.insertFactory(new Factory(
                 null,
                 factoryNameTextField.getText(),
                 factoryAddress,

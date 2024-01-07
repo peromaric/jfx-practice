@@ -32,9 +32,10 @@ public class AddNewItemController {
     @FXML
     private TextField itemSellingPriceTextField;
     private List<Category> categoryList;
+    private final Database database = Database.getInstance();
 
     public void initialize() throws SQLException, IOException {
-        categoryList = Database.getCategories();
+        categoryList = database.getCategories();
         ObservableList<String> itemCategoriesString = FXCollections.observableList(
                 categoryList.stream().map(NamedEntity::getName).toList()
         );
@@ -53,7 +54,7 @@ public class AddNewItemController {
                     new BigDecimal(itemProductionCostTextField.getText()),
                     new BigDecimal(itemSellingPriceTextField.getText())
             );
-            Database.insertItem(item);
+            database.insertItem(item);
             HelperFunctions.showOkAlert();
         } catch (RuntimeException | SQLException | IOException ex) {
             HelperFunctions.showErrorAlert(ex);

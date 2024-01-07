@@ -1,11 +1,12 @@
 package hr.tvz.dev.utils;
 
 import hr.tvz.dev.models.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,7 +15,32 @@ import java.util.Properties;
 
 public class Database {
 
-    private static Connection connectToDatabase() throws SQLException, IOException {
+    private static Database database_instance = null;
+    private Boolean activeConnectionWithDatabase;
+    private static final Logger logger = LoggerFactory.getLogger(Database.class);
+
+    private Database() {
+        activeConnectionWithDatabase = false;
+    }
+
+    public static synchronized Database getInstance() {
+        if (database_instance == null) {
+            database_instance = new Database();
+            logger.info("Database singleton instance created");
+        }
+
+        return database_instance;
+    }
+
+    private synchronized Connection connectToDatabase() throws SQLException, IOException {
+        while(activeConnectionWithDatabase) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                logger.error(e.getMessage());
+                logger.error(Thread.currentThread().getName() + " had issues with database connection!");
+            }
+        }
         Properties properties = new Properties();
         properties.load(new FileReader("conf/database.properties"));
         String url = properties.getProperty("databaseUrl");
@@ -23,7 +49,13 @@ public class Database {
         return DriverManager.getConnection(url, username, password);
     }
 
-    public static List<Address> getAddresses() throws SQLException, IOException {
+    private synchronized void disconnectFromDatabase(Connection connection) throws SQLException {
+        connection.close();
+        database_instance.activeConnectionWithDatabase = false;
+        notifyAll();
+    }
+
+    public synchronized List<Address> getAddresses() throws SQLException, IOException {
         Connection connection = connectToDatabase();
         List<Address> addresses = new ArrayList<>();
         Statement sqlStatement = connection.createStatement();
@@ -32,11 +64,11 @@ public class Database {
             Address address = getAddressFromResultSet(addressResultSet);
             addresses.add(address);
         }
-        connection.close();
+        disconnectFromDatabase(connection);
         return addresses;
     }
 
-    public static List<Category> getCategories() throws SQLException, IOException {
+    public synchronized List<Category> getCategories() throws SQLException, IOException {
         Connection connection = connectToDatabase();
         List<Category> categories = new ArrayList<>();
         Statement sqlStatement = connection.createStatement();
@@ -46,11 +78,11 @@ public class Database {
             Category category = getCategoryFromResultSet(categoriesResultSet);
             categories.add(category);
         }
-        connection.close();
+        disconnectFromDatabase(connection);
         return categories;
     }
 
-    public static List<Factory> getFactories() throws SQLException, IOException {
+    public synchronized List<Factory> getFactories() throws SQLException, IOException {
         Connection connection = connectToDatabase();
         List<Factory> factories = new ArrayList<>();
         Statement sqlStatement = connection.createStatement();
@@ -59,11 +91,11 @@ public class Database {
             Factory factory = getFactoryFromResultSet(factoryResultSet, connection);
             factories.add(factory);
         }
-        connection.close();
+        disconnectFromDatabase(connection);
         return factories;
     }
 
-    public static List<Item> getItems() throws SQLException, IOException {
+    public synchronized List<Item> getItems() throws SQLException, IOException {
         Connection connection = connectToDatabase();
         List<Item> items = new ArrayList<>();
         Statement sqlStatement = connection.createStatement();
@@ -72,11 +104,11 @@ public class Database {
             Item item = getItemFromResultSet(itemsResultSet, connection);
             items.add(item);
         }
-        connection.close();
+        disconnectFromDatabase(connection);
         return items;
     }
 
-    public static List<Store> getStores() throws SQLException, IOException {
+    public synchronized List<Store> getStores() throws SQLException, IOException {
         Connection connection = connectToDatabase();
         List<Store> stores = new ArrayList<>();
         Statement sqlStatement = connection.createStatement();
@@ -85,11 +117,11 @@ public class Database {
             Store store = getStoreFromResultSet(storeResultSet, connection);
             stores.add(store);
         }
-        connection.close();
+        disconnectFromDatabase(connection);
         return stores;
     }
 
-    public static List<Item> getFactoryItems(Connection connection, Long factoryId) throws SQLException {
+    public synchronized List<Item> getFactoryItems(Connection connection, Long factoryId) throws SQLException {
         List<Item> items = new ArrayList<>();
         PreparedStatement preparedStatement = connection.prepareStatement(
                 "SELECT * FROM FACTORY_ITEM FI, ITEM I WHERE FI.FACTORY_ID = (?) AND FI.ITEM_ID = I.ID;"
@@ -103,7 +135,7 @@ public class Database {
         return items;
     }
 
-    public static List<Item> getStoreItems(Connection connection, Long storeId) throws SQLException {
+    public synchronized List<Item> getStoreItems(Connection connection, Long storeId) throws SQLException {
         List<Item> items = new ArrayList<>();
         PreparedStatement sqlStatement = connection.prepareStatement("SELECT * FROM STORE_ITEM SI, ITEM I WHERE SI.STORE_ID = ? " +
                 "AND SI.ITEM_ID = I.ID;");
@@ -116,7 +148,7 @@ public class Database {
         return items;
     }
 
-    public static Item getItemById(Connection connection, Long id) throws SQLException {
+    public synchronized Item getItemById(Connection connection, Long id) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(
                 "SELECT * FROM ITEM WHERE ID = ?;"
         );
@@ -126,7 +158,7 @@ public class Database {
         return getItemFromResultSet(itemResultSet, connection);
     }
 
-    public static Address getAddressById(Connection connection, String id) throws SQLException {
+    public synchronized Address getAddressById(Connection connection, String id) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(
                 "SELECT * FROM ADDRESS WHERE ID = ?;"
         );
@@ -136,7 +168,7 @@ public class Database {
         return getAddressFromResultSet(addressResultSet);
     }
 
-    public static Store getStoreByName(Connection connection, String name) throws SQLException {
+    public synchronized Store getStoreByName(Connection connection, String name) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(
                 "SELECT * FROM STORE WHERE NAME = ?;"
         );
@@ -146,7 +178,7 @@ public class Database {
         return getStoreFromResultSet(storeResultSet, connection);
     }
 
-    public static Category getCategoryById(Connection connection, String id) throws SQLException {
+    public synchronized Category getCategoryById(Connection connection, String id) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(
                 "SELECT * FROM CATEGORY WHERE ID = ?;"
         );
@@ -157,17 +189,17 @@ public class Database {
     }
 
 
-    public static void insertCategory(Category category) throws SQLException, IOException {
+    public synchronized void insertCategory(Category category) throws SQLException, IOException {
         Connection connection = connectToDatabase();
         PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO CATEGORY(NAME, DESCRIPTION) VALUES (?,?)");
         preparedStatement.setString(1, category.getName());
         preparedStatement.setString(2, category.getDescription());
         preparedStatement.executeUpdate();
-        connection.close();
+        disconnectFromDatabase(connection);
     }
 
-    public static void insertItem(Item item) throws SQLException, IOException {
+    public synchronized void insertItem(Item item) throws SQLException, IOException {
         Connection connection = connectToDatabase();
         PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO ITEM(CATEGORY_ID, NAME, WIDTH, HEIGHT, LENGTH, PRODUCTION_COST, SELLING_PRICE) " +
@@ -180,10 +212,10 @@ public class Database {
         preparedStatement.setBigDecimal(6, item.getProductionCost());
         preparedStatement.setBigDecimal(7, item.getSellingPrice());
         preparedStatement.executeUpdate();
-        connection.close();
+        disconnectFromDatabase(connection);
     }
 
-    public static void insertStore(Store store) throws SQLException, IOException {
+    public synchronized void insertStore(Store store) throws SQLException, IOException {
         Connection connection = connectToDatabase();
         PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO STORE(NAME, WEB_ADDRESS) VALUES (?,?)");
@@ -199,7 +231,7 @@ public class Database {
             preparedStatementItem.setLong(2, item.getId());
             preparedStatementItem.execute();
         }
-        connection.close();
+        disconnectFromDatabase(connection);
     }
 
     public static Long insertAddress(Connection connection, Address address) throws SQLException, IOException {
@@ -221,7 +253,7 @@ public class Database {
         } else return 0L;
     }
 
-    public static void insertFactory(Factory factory) throws SQLException, IOException {
+    public synchronized void insertFactory(Factory factory) throws SQLException, IOException {
         Connection connection = connectToDatabase();
 
         Long addressId = insertAddress(connection, factory.getAddress());
@@ -249,7 +281,7 @@ public class Database {
             preparedStatement.executeUpdate();
         }
 
-        connection.close();
+        disconnectFromDatabase(connection);
     }
     private static Category getCategoryFromResultSet(ResultSet categoryResultSet) throws SQLException {
         Long id = categoryResultSet.getLong("ID");
@@ -268,7 +300,7 @@ public class Database {
         return new Address(id, street, houseNumber, city, postalCode);
     }
 
-    private static Factory getFactoryFromResultSet(
+    private synchronized Factory getFactoryFromResultSet(
             ResultSet factoryResultSet,
             Connection connection
     ) throws SQLException
@@ -282,7 +314,7 @@ public class Database {
         return new Factory(id, name, factoryAddress, new HashSet<>(factoryItems));
     }
 
-    private static Store getStoreFromResultSet(
+    private synchronized Store getStoreFromResultSet(
             ResultSet storeResultSet,
             Connection connection
     ) throws SQLException
@@ -295,7 +327,7 @@ public class Database {
         return new Store(id, name, webAddresss, new HashSet<>(storeItems));
     }
 
-    private static Item getItemFromResultSet(ResultSet itemResultSet, Connection connection) throws SQLException {
+    private synchronized Item getItemFromResultSet(ResultSet itemResultSet, Connection connection) throws SQLException {
         Long id = itemResultSet.getLong("ID");
         Integer categoryId = itemResultSet.getInt("CATEGORY_ID");
         String name = itemResultSet.getString("NAME");

@@ -30,9 +30,10 @@ public class AddNewStoreController {
     @FXML
     public ListView<String> storeItemsListView;
     public List<Item> allItems;
+    private final Database database = Database.getInstance();
 
     public void initialize() throws SQLException, IOException {
-        allItems = Database.getItems();
+        allItems = database.getItems();
         storeItemsListView.cellFactoryProperty();
         storeItemsListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         storeItemsListView.setItems(
@@ -51,7 +52,7 @@ public class AddNewStoreController {
                     storeWebAddressTextField.getText(),
                     new HashSet<>(chosenItems)
             );
-            Database.insertStore(store);
+            database.insertStore(store);
             HelperFunctions.showOkAlert();
         } catch (RuntimeException | SQLException | IOException ex) {
             HelperFunctions.showErrorAlert(ex);

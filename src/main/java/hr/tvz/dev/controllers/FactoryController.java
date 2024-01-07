@@ -34,13 +34,14 @@ public class FactoryController {
     private TableColumn<Factory, String> itemsTableColumn;
 
     private Optional<List<Factory>> factories;
+    private final Database database = Database.getInstance();
     public void initialize() throws SQLException, IOException {
         nameTableColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getName()));
         addressTableColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getAddress().toString()));
         itemsTableColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getItemsAsString()));
 
-        List<Item> items = Database.getItems();
-        setFactories(Optional.of(Database.getFactories()));
+        List<Item> items = database.getItems();
+        setFactories(Optional.of(database.getFactories()));
         ObservableList<Factory> factoryObservableList = FXCollections.observableArrayList(getFactories().get());
         factoryItemComboBox.setItems(FXCollections.observableList(items.stream().map(Item::getName).toList()));
         factoryTableView.setItems(factoryObservableList);

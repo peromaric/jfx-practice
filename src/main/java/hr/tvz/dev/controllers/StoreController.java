@@ -34,14 +34,15 @@ public class StoreController {
     private TableColumn<Store, String> itemsTableColumn;
 
     private Optional<List<Store>> stores;
+    private final Database database = Database.getInstance();
     public void initialize() throws SQLException, IOException {
         nameTableColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getName()));
         addressTableColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getWebAddress()));
         itemsTableColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getItemsAsString()));
 
-        List<Category> categories = Database.getCategories();
-        List<Item> items = Database.getItems();
-        setStores(Optional.of(Database.getStores()));
+        List<Category> categories = database.getCategories();
+        List<Item> items = database.getItems();
+        setStores(Optional.of(database.getStores()));
         ObservableList<Store> storeObservableList = FXCollections.observableArrayList(getStores().get());
         storeItemComboBox.setItems(FXCollections.observableList(items.stream().map(Item::getName).toList()));
         storeTableView.setItems(storeObservableList);
