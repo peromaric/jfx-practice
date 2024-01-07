@@ -95,7 +95,7 @@ public class MenuController {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("category.fxml"));
         try {
             Scene scene = new Scene(fxmlLoader.load(), 600, 400);
-            Main.getMainStage().setTitle("Add new category");
+            Main.getMainStage().setTitle("Category");
             Main.getMainStage().setScene(scene);
             Main.getMainStage().show();
         } catch (IOException e) {
