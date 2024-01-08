@@ -35,6 +35,7 @@ public class Database {
     private synchronized Connection connectToDatabase() throws SQLException, IOException {
         while(activeConnectionWithDatabase) {
             try {
+                logger.info(Thread.currentThread().getName() + " waiting to connect to the database...");
                 wait();
             } catch (InterruptedException e) {
                 logger.error(e.getMessage());
@@ -52,6 +53,7 @@ public class Database {
     private synchronized void disconnectFromDatabase(Connection connection) throws SQLException {
         connection.close();
         database_instance.activeConnectionWithDatabase = false;
+        logger.info(Thread.currentThread().getName() + " disconnecting from the database and notifying...");
         notifyAll();
     }
 
